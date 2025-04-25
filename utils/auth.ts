@@ -2,11 +2,13 @@
 
 export const AUTORIZADOS: { email: string; password: string }[] = [
   { email: "briancueva97@gmail.com", password: "tricolor123" },
-  { email: "admin@tricolor.com", password: "admin2024" },
-  { email: "ventas@tutienda.com", password: "ventasSegura" },
-  { email: "equipo@logistica.com", password: "logistica456" },
-  { email: "supervisor@tricolor.com", password: "supervisor789" },
-  { email: "jefe@empresa.com", password: "jefazo321" },
+  {
+    email: "administrador1@tricolorbyamerica.com",
+    password: "02IU1UkNw3Wdf5X",
+  },
+  { email: "ventas2@tricolorbyamerica.com", password: "dhtNvjY3L4LeP8x" },
+  { email: "ymedina@pinturasamerica.com", password: "2wdVy8SzYw1u2VD" },
+  { email: "mabad@pinturasamerica.com", password: "9terh4fKDTMVz8r" },
 ];
 
 export const getAuthMap = () => {
