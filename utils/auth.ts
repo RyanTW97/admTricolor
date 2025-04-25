@@ -1,7 +1,7 @@
 // utils/auth.ts
 
 export const AUTORIZADOS: { email: string; password: string }[] = [
-  { email: "briancueva97@gmail.com", password: "tricolor123" },
+  { email: "briancueva97@gmail.com", password: "YwAXVmpFzqIy4Do" },
   {
     email: "administrador1@tricolorbyamerica.com",
     password: "02IU1UkNw3Wdf5X",
