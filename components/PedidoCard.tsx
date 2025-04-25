@@ -34,6 +34,7 @@ interface Factura {
   referencia: string;
   identificacionTipo: string;
   identificacionNumero: string;
+  email: string;
 }
 
 interface PedidoProps {
@@ -198,6 +199,7 @@ export function PedidoCard({
                 <li>
                   Nombre: {factura.nombre} {factura.apellido}
                 </li>
+                <li>Correo: {factura.email}</li>
                 <li>Teléfono: {factura.telefono}</li>
                 <li>
                   Dirección: {factura.direccion}, {factura.ciudad},{" "}
