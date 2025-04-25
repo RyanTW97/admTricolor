@@ -47,10 +47,11 @@ interface PedidoProps {
   productos: Producto[];
   trackingNumber?: string | null;
   deliveryDate?: string | null;
+  fechaEnvio?: string | null; // 👈 Nuevo campo
   factura?: Factura;
+  metodoEnvio?: string;
   onGuardar?: (id: number, data: any) => Promise<any>;
   onRefetch?: () => void;
-  nuevo?: boolean; // ✅ nueva prop
 }
 
 const statusLabels: Record<string, string> = {
@@ -80,17 +81,23 @@ export function PedidoCard({
   productos,
   trackingNumber,
   deliveryDate,
+  fechaEnvio, // 👈 Recibimos fechaEnvio
   factura,
+  metodoEnvio,
   onGuardar,
   onRefetch,
-  nuevo,
 }: PedidoProps) {
   const [expanded, setExpanded] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(status);
   const [tracking, setTracking] = useState(trackingNumber || "");
   const [delivery, setDelivery] = useState(deliveryDate || "");
+  const [envio, setEnvio] = useState(
+    fechaEnvio ? fechaEnvio.slice(0, 16) : "" // 👈 Formato para datetime-local
+  );
   const [note, setNote] = useState(nota || "");
   const [saving, setSaving] = useState(false);
+
+  const isNuevo = status === "pending" || status === "paid";
 
   const handleGuardar = async () => {
     try {
@@ -100,6 +107,7 @@ export function PedidoCard({
         status: currentStatus,
         trackingNumber: tracking || null,
         deliveryDate: delivery || null,
+        fechaEnvio: envio || null, // 👈 Guardamos fechaEnvio
         admNote: note || null,
       });
 
@@ -118,12 +126,17 @@ export function PedidoCard({
         <div>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             Pedido #{id}
-            {nuevo && (
+            {isNuevo && (
               <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
                 Nuevo pedido
               </span>
             )}
           </CardTitle>
+
+          <p className="text-sm text-muted-foreground">
+            {metodoEnvio?.trim() || "-"}
+          </p>
+
           <p className="text-sm text-muted-foreground">
             {cliente} – {ciudad}
           </p>
@@ -215,6 +228,16 @@ export function PedidoCard({
                 type="date"
                 value={delivery}
                 onChange={(e) => setDelivery(e.target.value)}
+              />
+            </div>
+
+            {/* 👇 Nuevo campo fechaEnvio */}
+            <div>
+              <p className="font-medium mb-1">Fecha de envío:</p>
+              <Input
+                type="datetime-local"
+                value={envio}
+                onChange={(e) => setEnvio(e.target.value)}
               />
             </div>
           </div>
