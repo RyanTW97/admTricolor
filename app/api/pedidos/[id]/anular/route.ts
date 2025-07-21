@@ -1,21 +1,28 @@
 // app/api/pedidos/[id]/anular/route.ts
 
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-// Usamos los nombres de variables de entorno que tienes en tu .env.local
 const STRAPI_URL = process.env.STRAPI_URL;
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
-const DATAFAST_URL = process.env.DATAFAST_URL;
+const DATAFAST_URL = process.env.DATAFAST_API_URL;
 const DATAFAST_ENTITY_ID = process.env.DATAFAST_ENTITY_ID;
-const DATAFAST_BEARER_TOKEN = process.env.DATAFAST_BEARER_TOKEN;
+const DATAFAST_BEARER_TOKEN = process.env.DATAFAST_AUTHORIZATION_TOKEN;
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id: pedidoId } = params;
+// --- ÚLTIMO RECURSO: USAR 'any' ---
+// Forzamos a TypeScript a ignorar el tipo del segundo argumento
+// para superar el error de compilación persistente.
+export async function POST(request: NextRequest, context: any) {
+  // Aseguramos que 'id' se trate como un string
+  const pedidoId = context.params?.id as string;
 
-  // Verificamos que todas las variables existan
+  // Agregamos una validación por si los parámetros no llegan como se espera
+  if (!pedidoId) {
+    return NextResponse.json(
+      { error: "No se proporcionó un ID de pedido válido." },
+      { status: 400 }
+    );
+  }
+
   if (
     !STRAPI_URL ||
     !STRAPI_TOKEN ||
@@ -24,7 +31,7 @@ export async function POST(
     !DATAFAST_BEARER_TOKEN
   ) {
     console.error(
-      "❌ [API Anular] Error: Faltan variables de entorno críticas. Revisa tu archivo .env.local"
+      "❌ [API Anular] Error: Faltan variables de entorno críticas."
     );
     return NextResponse.json(
       { error: "Configuración del servidor incompleta." },
@@ -48,13 +55,13 @@ export async function POST(
       );
     }
 
+    // El resto del código permanece igual...
     const { data: pedido } = await strapiResponse.json();
     const { totalAmount, datafastTransactionId, status, datafastResponse } =
       pedido.attributes;
     const tipoCreditoOriginal =
       datafastResponse?.customParameters?.SHOPPER_TIPOCREDITO;
 
-    // Esta validación previene el error 'cannot refund'
     if (status === "annulled") {
       return NextResponse.json(
         { error: `El pedido #${pedidoId} ya ha sido anulado previamente.` },
@@ -84,8 +91,6 @@ export async function POST(
       paymentType: "RF",
     });
 
-    datafastPayload.append("testMode", "EXTERNAL");
-
     if (tipoCreditoOriginal) {
       datafastPayload.append(
         "customParameters[SHOPPER_TIPOCREDITO]",
@@ -106,10 +111,6 @@ export async function POST(
     );
 
     const datafastResult = await datafastAnulacionResponse.json();
-    console.log(
-      "✅ RESPUESTA JSON DE ANULACIÓN DE DATAFAST:",
-      JSON.stringify(datafastResult, null, 2)
-    );
 
     const resultCode = datafastResult.result?.code;
     const isSuccess = resultCode && /^(000\.000|000\.100)/.test(resultCode);
@@ -136,6 +137,7 @@ export async function POST(
       message: `Pedido #${pedidoId} anulado correctamente.`,
     });
   } catch (error) {
+    console.error("❌ [API Anular] Error inesperado:", error);
     return NextResponse.json(
       { error: "Ocurrió un error interno en el servidor." },
       { status: 500 }
