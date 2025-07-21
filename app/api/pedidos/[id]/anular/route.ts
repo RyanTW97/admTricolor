@@ -4,7 +4,7 @@ import { NextResponse, NextRequest } from "next/server";
 
 const STRAPI_URL = process.env.STRAPI_URL;
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN;
-const DATAFAST_URL = process.env.DATAFAST_API_URL;
+const DATAFAST_URL = process.env.DATAFAST_URL;
 const DATAFAST_ENTITY_ID = process.env.DATAFAST_ENTITY_ID;
 const DATAFAST_BEARER_TOKEN = process.env.DATAFAST_AUTHORIZATION_TOKEN;
 
